@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student View - Teacher Availability</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+    header {
+      background-color: hsl(182, 39%, 49%);
+      color: white;
+      padding: 10px;
+      text-align: center;
+    }
+    form {
+      margin-top: 20px;
+    }
+    input, select, button {
+      padding: 10px;
+      margin: 5px 0;
+      width: 100%;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    button {
+      background-color: hsl(182, 39%, 49%);
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #4caaae;
+    }
+    .result {
+      margin-top: 20px;
+      padding: 10px;
+      background-color: #f8f9fa;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    a {
+      color: #0d1718;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <h1>Student View - Teacher Availability</h1>
+    <a href="index.html">Back to Main Page</a>
+  </header>
+
+  <!-- Student Input Form -->
+  <form id="studentForm">
+    <h2>Check Teacher Availability</h2>
+    <input type="date" id="freeDate" required>
+    <input type="time" id="startTime" placeholder="Start Time" required>
+    <input type="time" id="endTime" placeholder="End Time" required>
+    <select id="department" required>
+      <option value="">Select Department</option>
+      <option value="Computer Science">Computer Science</option>
+      <option value="Mathematics">Mathematics</option>
+      <option value="Physics">Physics</option>
+      <option value="Chemistry">Chemistry</option>
+    </select>
+    <button type="submit">Check Availability</button>
+  </form>
+
+  <!-- Result Section -->
+  <div class="result" id="resultSection">
+    <p>Enter your details above to see available teachers.</p>
+  </div>
+
+  <script>
+    // JavaScript to handle form submission
+    document.getElementById('studentForm').addEventListener('submit', function (event) {
+      event.preventDefault(); // Prevent form submission
+
+      // Get student input
+      const freeDate = document.getElementById('freeDate').value;
+      const startTime = document.getElementById('startTime').value;
+      const endTime = document.getElementById('endTime').value;
+      const department = document.getElementById('department').value;
+
+      // Get teacher data from localStorage
+      const teacherData = JSON.parse(localStorage.getItem('teacherData')) || [];
+
+      // Filter teachers based on student input
+      const availableTeachers = teacherData.filter(teacher =>
+        teacher.date === freeDate &&
+        teacher.dept === department &&
+        startTime >= teacher.time.split(' - ')[0] &&
+        endTime <= teacher.time.split(' - ')[1]
+      );
+
+      // Display results
+      const resultSection = document.getElementById('resultSection');
+      if (availableTeachers.length > 0) {
+        resultSection.innerHTML = `
+          <h2>Available Teachers</h2>
+          <ul>
+            ${availableTeachers.map(teacher => `
+              <li>
+                <strong>${teacher.name}</strong><br>
+                Date: ${teacher.date}<br>
+                Time: ${teacher.time}<br>
+                Department: ${teacher.dept}<br>
+                Contact: ${teacher.contact}
+              </li>
+            `).join('')}
+          </ul>
+        `;
+      } else {
+        resultSection.innerHTML = `<p>No teachers are available on ${freeDate} between ${startTime} and ${endTime} in the ${department} department.</p>`;
+      }
+    });
+  </script>
+</body>
+</html>
